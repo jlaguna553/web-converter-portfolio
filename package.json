@@ -1,0 +1,50 @@
+{
+  "name": "web-to-native",
+  "version": "1.0.0",
+  "description": "Convierte proyectos web a apps nativas Android/iOS",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:linux": "electron-builder --linux",
+    "build:mac": "electron-builder --mac"
+  },
+  "build": {
+    "appId": "com.webconverter.app",
+    "productName": "Web to Native Converter",
+    "directories": {
+      "output": "dist"
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "category": "Development"
+    },
+    "win": {
+      "target": ["nsis", "portable"]
+    },
+    "mac": {
+      "target": ["dmg"]
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*",
+      "src/**/*",
+      "assets/**/*"
+    ]
+  },
+  "keywords": ["electron", "android", "ios", "capacitor", "converter"],
+  "author": "Web Converter",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "dependencies": {
+    "fs-extra": "^11.2.0",
+    "semver": "^7.5.4",
+    "which": "^3.0.1"
+  }
+}

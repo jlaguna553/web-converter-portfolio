@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';">
+  <title>Web to Native Converter</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="app-logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <rect width="28" height="28" rx="7" fill="url(#grad)"/>
+          <path d="M8 14l4 4 8-8" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <defs>
+            <linearGradient id="grad" x1="0" y1="0" x2="28" y2="28">
+              <stop offset="0%" stop-color="#6366f1"/>
+              <stop offset="100%" stop-color="#8b5cf6"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div>
+        <h1 class="app-title">Web → Native</h1>
+        <p class="app-subtitle">Convierte proyectos web a Android / iOS</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <div id="os-badge" class="os-badge"></div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="app-main">
+    <!-- Left Panel: Configuration -->
+    <section class="panel panel-config" id="config-panel">
+
+      <!-- Step 1: Project -->
+      <div class="step-card" id="step-project">
+        <div class="step-header">
+          <span class="step-number">1</span>
+          <h2 class="step-title">Proyecto Web</h2>
+          <span id="project-badge" class="badge badge-pending">Pendiente</span>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Carpeta del proyecto</label>
+          <div class="path-input-row">
+            <div class="path-display" id="project-path-display" data-placeholder="Selecciona o arrastra una carpeta...">
+              Selecciona o arrastra una carpeta...
+            </div>
+            <button class="btn btn-secondary btn-icon" id="btn-browse-project" title="Examinar">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M2 3.5A1.5 1.5 0 013.5 2h3.086L8 3.414V4H2V3.5zM2 5h12v7.5A1.5 1.5 0 0112.5 14h-9A1.5 1.5 0 012 12.5V5z" fill="currentColor"/>
+              </svg>
+            </button>
+          </div>
+          <div id="project-drop-zone" class="drop-zone">
+            <div class="drop-icon">📂</div>
+            <p>Arrastra tu proyecto aquí</p>
+            <small>o usa el botón de arriba</small>
+          </div>
+        </div>
+
+        <!-- Project info card -->
+        <div id="project-info" class="project-info hidden">
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Framework</span>
+              <span id="info-framework" class="info-value badge-framework">—</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Build output</span>
+              <span id="info-build" class="info-value">—</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">package.json</span>
+              <span id="info-pkg" class="info-value">—</span>
+            </div>
+          </div>
+          <div id="project-warnings" class="warnings-container hidden"></div>
+          <div id="project-errors" class="errors-container hidden"></div>
+        </div>
+      </div>
+
+      <!-- Step 2: App Config -->
+      <div class="step-card" id="step-appconfig">
+        <div class="step-header">
+          <span class="step-number">2</span>
+          <h2 class="step-title">Configuración de la App</h2>
+        </div>
+
+        <div class="fields-row">
+          <div class="field-group flex-1">
+            <label class="field-label" for="app-name">Nombre de la app</label>
+            <input class="field-input" type="text" id="app-name" placeholder="Mi App" value="My App">
+          </div>
+          <div class="field-group flex-1">
+            <label class="field-label" for="app-version">Versión</label>
+            <input class="field-input" type="text" id="app-version" placeholder="1.0.0" value="1.0.0">
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="app-id">Bundle / Package ID</label>
+          <input class="field-input" type="text" id="app-id" placeholder="com.empresa.miapp" value="com.example.myapp">
+          <span class="field-hint">Ejemplo: com.empresa.nombreapp (solo letras, números y puntos)</span>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Plataforma destino</label>
+          <div class="platform-select">
+            <label class="platform-option" id="opt-android">
+              <input type="radio" name="platform" value="android" checked>
+              <div class="platform-card">
+                <span class="platform-icon">🤖</span>
+                <span class="platform-name">Android</span>
+                <span class="platform-ext">.apk</span>
+              </div>
+            </label>
+            <label class="platform-option" id="opt-ios">
+              <input type="radio" name="platform" value="ios">
+              <div class="platform-card">
+                <span class="platform-icon">🍎</span>
+                <span class="platform-name">iOS</span>
+                <span class="platform-ext">.ipa</span>
+              </div>
+            </label>
+            <label class="platform-option" id="opt-both">
+              <input type="radio" name="platform" value="both">
+              <div class="platform-card">
+                <span class="platform-icon">📱</span>
+                <span class="platform-name">Ambas</span>
+                <span class="platform-ext">APK + IPA</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="fields-row">
+          <div class="field-group flex-1">
+            <label class="field-label">Firma APK</label>
+            <select class="field-select" id="signing-mode">
+              <option value="debug">Debug (sin firma — para pruebas)</option>
+              <option value="release">Release (sin firma — distribución)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="toggle-row">
+            <input type="checkbox" id="build-first" checked>
+            <span class="toggle-label">Ejecutar <code>npm run build</code> antes de convertir</span>
+          </label>
+          <span class="field-hint">Desactiva si ya tienes la carpeta de build generada.</span>
+        </div>
+      </div>
+
+      <!-- Step 3: Output -->
+      <div class="step-card" id="step-output">
+        <div class="step-header">
+          <span class="step-number">3</span>
+          <h2 class="step-title">Carpeta de salida</h2>
+        </div>
+
+        <div class="field-group">
+          <div class="path-input-row">
+            <div class="path-display" id="output-path-display" data-placeholder="Selecciona dónde guardar el APK/IPA...">
+              Selecciona dónde guardar el APK/IPA...
+            </div>
+            <button class="btn btn-secondary btn-icon" id="btn-browse-output" title="Examinar">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M2 3.5A1.5 1.5 0 013.5 2h3.086L8 3.414V4H2V3.5zM2 5h12v7.5A1.5 1.5 0 0112.5 14h-9A1.5 1.5 0 012 12.5V5z" fill="currentColor"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Requirements Check -->
+      <div class="step-card" id="step-requirements">
+        <div class="step-header">
+          <span class="step-number">✓</span>
+          <h2 class="step-title">Requisitos del sistema</h2>
+          <button class="btn btn-ghost btn-sm" id="btn-check-reqs">Verificar</button>
+        </div>
+        <div id="requirements-list" class="requirements-list">
+          <p class="req-hint">Selecciona una plataforma y presiona "Verificar" para comprobar los requisitos.</p>
+        </div>
+      </div>
+
+      <!-- Convert Button -->
+      <div class="convert-actions">
+        <button class="btn btn-primary btn-convert" id="btn-convert" disabled>
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M9 2v4M9 12v4M2 9h4M12 9h4M4.22 4.22l2.83 2.83M10.95 10.95l2.83 2.83M4.22 13.78l2.83-2.83M10.95 7.05l2.83-2.83" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <span id="btn-convert-text">Convertir</span>
+        </button>
+        <button class="btn btn-danger btn-cancel hidden" id="btn-cancel">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Cancelar
+        </button>
+      </div>
+    </section>
+
+    <!-- Right Panel: Progress & Logs -->
+    <section class="panel panel-progress" id="progress-panel">
+
+      <!-- Status Overview -->
+      <div class="status-card" id="status-card">
+        <div class="status-icon" id="status-icon">⏳</div>
+        <div class="status-content">
+          <div class="status-title" id="status-title">Listo para convertir</div>
+          <div class="status-subtitle" id="status-subtitle">Configura el proyecto y presiona "Convertir"</div>
+        </div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="progress-section">
+        <div class="progress-header">
+          <span class="progress-label" id="progress-label">Progreso</span>
+          <span class="progress-pct" id="progress-pct">0%</span>
+        </div>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" id="progress-bar" style="width: 0%"></div>
+        </div>
+        <div class="progress-step" id="progress-step-text">Esperando inicio...</div>
+      </div>
+
+      <!-- Steps Timeline -->
+      <div class="steps-timeline" id="steps-timeline">
+        <div class="timeline-item pending" data-step="copy">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <span class="timeline-title">Copiar proyecto</span>
+          </div>
+        </div>
+        <div class="timeline-item pending" data-step="install-deps">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <span class="timeline-title">Instalar dependencias</span>
+          </div>
+        </div>
+        <div class="timeline-item pending" data-step="build-web">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <span class="timeline-title">Build web</span>
+          </div>
+        </div>
+        <div class="timeline-item pending" data-step="cap-install">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <span class="timeline-title">Instalar Capacitor</span>
+          </div>
+        </div>
+        <div class="timeline-item pending" data-step="cap-init">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <span class="timeline-title">Inicializar Capacitor</span>
+          </div>
+        </div>
+        <div class="timeline-item pending" data-step="add-platform">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <span class="timeline-title">Agregar plataforma</span>
+          </div>
+        </div>
+        <div class="timeline-item pending" data-step="sync">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <span class="timeline-title">Sincronizar assets</span>
+          </div>
+        </div>
+        <div class="timeline-item pending" data-step="build-native">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <span class="timeline-title">Compilar APK/IPA</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Log Terminal -->
+      <div class="log-section">
+        <div class="log-header">
+          <span class="log-title">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.2"/>
+              <path d="M3.5 5L5.5 7L3.5 9M7 9h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Terminal de logs
+          </span>
+          <div class="log-actions">
+            <button class="btn btn-ghost btn-xs" id="btn-clear-logs" title="Limpiar logs">Limpiar</button>
+            <button class="btn btn-ghost btn-xs" id="btn-auto-scroll" title="Auto-scroll" class="active">↓ Auto</button>
+          </div>
+        </div>
+        <div class="log-terminal" id="log-terminal">
+          <div class="log-welcome">
+            <span class="log-dim">Web to Native Converter — v1.0.0</span><br>
+            <span class="log-dim">Listo. Configura tu proyecto y presiona Convertir.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Output Files -->
+      <div id="output-files-section" class="output-files-section hidden">
+        <h3 class="output-files-title">✅ Archivos generados</h3>
+        <div id="output-files-list" class="output-files-list"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
